@@ -1,8 +1,8 @@
-# 📁 AURORA HOME OPS - PROYECTO COMPLETO
+# 📁 AURORA HOME OPS — Código Fuente Completo
 
 ---
 
-## 🏠 simulador_home.py
+## 🏠 `simulador_home.py`
 
 ```python
 import paho.mqtt.client as mqtt
@@ -20,37 +20,43 @@ client.loop_start()
 while True:
     data = {
         "temperatura": random.randint(20, 60),
-        "gas": random.choice([False, False, False, True]),
+        "gas":    random.choice([False, False, False, True]),
         "puerta": random.choice([False, True]),
-        "agua": random.choice([False, False, True])
+        "agua":   random.choice([False, False, True])
     }
 
     client.publish("aurora/home/sala", json.dumps(data))
     print("📡 Enviado:", data)
 
     time.sleep(5)
-🚨 alertas_home.py
+```
+
+---
+
+## 🚨 `alertas_home.py`
+
+```python
 import paho.mqtt.client as mqtt
 import json
 import requests
 
 FLESPI_TOKEN = "TU_TOKEN_FLESPI_AQUI"
 
-TOKEN = "TU_TOKEN_TELEGRAM"
+TOKEN   = "TU_TOKEN_TELEGRAM"
 CHAT_ID = "TU_CHAT_ID"
 
 def enviar_alerta(msg):
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    url     = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
     payload = {"chat_id": CHAT_ID, "text": msg}
     requests.post(url, data=payload)
 
 def on_message(client, userdata, msg):
     data = json.loads(msg.payload.decode())
 
-    temp = data.get("temperatura", 0)
-    gas = data.get("gas", False)
+    temp   = data.get("temperatura", 0)
+    gas    = data.get("gas",    False)
     puerta = data.get("puerta", False)
-    agua = data.get("agua", False)
+    agua   = data.get("agua",   False)
 
     print("📥 Recibido:", data)
 
@@ -75,7 +81,13 @@ client.on_message = on_message
 
 print("🚨 Sistema de alertas activo...")
 client.loop_forever()
-🖥️ app.py
+```
+
+---
+
+## 🖥️ `app.py`
+
+```python
 from flask import Flask, render_template, jsonify
 import paho.mqtt.client as mqtt
 import json
@@ -105,7 +117,13 @@ def data():
 
 if __name__ == "__main__":
     app.run(debug=True)
-🌐 templates/index.html
+```
+
+---
+
+## 🌐 `templates/index.html`
+
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -139,21 +157,21 @@ const chart = new Chart(ctx, {
     }
 });
 
-async function update(){
-    const res = await fetch('/data');
+async function update() {
+    const res  = await fetch('/data');
     const data = await res.json();
 
-    document.getElementById("temp").innerText = "🌡️ Temperatura: " + data.temperatura;
-    document.getElementById("gas").innerText = "💨 Gas: " + (data.gas ? "ALERTA" : "OK");
-    document.getElementById("puerta").innerText = "🚪 Puerta: " + (data.puerta ? "ABIERTA" : "CERRADA");
-    document.getElementById("agua").innerText = "💧 Agua: " + (data.agua ? "FUGA" : "OK");
+    document.getElementById("temp").innerText   = "🌡️ Temperatura: " + data.temperatura;
+    document.getElementById("gas").innerText    = "💨 Gas: "    + (data.gas    ? "ALERTA"   : "OK");
+    document.getElementById("puerta").innerText = "🚪 Puerta: " + (data.puerta ? "ABIERTA"  : "CERRADA");
+    document.getElementById("agua").innerText   = "💧 Agua: "   + (data.agua   ? "FUGA"     : "OK");
 
-    let time = new Date().toLocaleTimeString();
+    const time = new Date().toLocaleTimeString();
 
     chart.data.labels.push(time);
     chart.data.datasets[0].data.push(data.temperatura);
 
-    if(chart.data.labels.length > 20){
+    if (chart.data.labels.length > 20) {
         chart.data.labels.shift();
         chart.data.datasets[0].data.shift();
     }
@@ -166,3 +184,4 @@ setInterval(update, 2000);
 
 </body>
 </html>
+```
